@@ -1,7 +1,9 @@
 #![allow(non_snake_case)]
 
 
-mod searching;
+mod UninformedSearching;
+mod graphs;
+mod InformedSeaching;
 
 fn main() {
     println!("Hello, world!");
