@@ -1,8 +1,8 @@
 #![allow(dead_code)]
 #![allow(non_camel_case_types)]
 
-use rand::{random as ran, Rng};
-use std::{collections::HashMap, vec};
+use rand::Rng;
+use std::collections::HashMap;
 
 enum action_type {
     unweighted(u16),    // Reference to the key to a Node in the graph (HashMap)
@@ -51,20 +51,20 @@ impl Node {
     }
 }
 
-enum graph_type {
+pub enum graph_type {
     wieghted,
     unweighted,
     maze,
 }
-struct Graph {
+pub struct Graph {
     num_Nodes: u16,
     graph: HashMap<u16, Node>,
     max_val: u16, // As a suitable goal Node, especially in the hill-climbing algorithm!!
 }
 
 impl Graph {
+    // Make a simple Hardcoded graph!!
     /*
-        Make a simple Hardcoded graph!!
         let map = HashMap::from([
             ("a", 1),
             ("b", 2),
@@ -79,6 +79,7 @@ impl Graph {
         for i in 1..=num_Nodes {
             let nv = rand::thread_rng().gen_range(0..=100);
             let mut nbrs: Vec<u16> = Vec::new();
+
             // A fancy for loop to assign random nbrs to a Node!!
             (0..3).for_each(|_| {
                 let node_indx = rand::thread_rng().gen_range(1..=num_Nodes);
@@ -111,14 +112,28 @@ impl Graph {
     }
 
     pub fn print_graph(&self) {
-        // keys = self.graph.keys()
-        // for k in keys:
-        //     print("Node_state: ", k, '\nNode_val:', self.graph[k].node_val)
-        //     print("Nbr_st\tValue")
-        //     for nbr in self.graph[k].nbrs:
-        //         print(self.graph[nbr].state, '\t\t', self.graph[nbr].node_val)
-        //     print('\n')
-        let keys = self.graph.keys();
+        /*
+            keys = self.graph.keys()
+            for k in keys:
+                print("Node_state: ", k, '\nNode_val:', self.graph[k].node_val)
+                print("Nbr_st\tValue")
+                for nbr in self.graph[k].nbrs:
+                    print(self.graph[nbr].state, '\t\t', self.graph[nbr].node_val)
+                print('\n')
+        */
+
+        // Basic printing for unweighted, directed graph
+        println!("Printing Graph!!");
+        for key in self.graph.keys() {
+            println!("Node_state: {}", self.graph[key].state);
+            println!("Node_value: {}", self.graph[key].node_val);
+            print!("Neighbours: ");
+            for i in &self.graph[key].actions {
+                print!("{}\t", *i);
+            }
+            println!("\n");
+        }
+        println!("\nEnd of Graph!!\n");
     }
 
     pub fn get_graph(gt: graph_type, num_Nodes: u16) -> Graph {
@@ -130,36 +145,34 @@ impl Graph {
     }
 }
 
-// import random
-
-// class Node:
-//     def __init__(self, st):
-//         self.state = st
-//         self.nbrs = []
-//         self.node_val = random.randint(100, 501)
-
-// class Graph:
-//     def __init__(self):
-//         self.graph = {}
-//         self.max_val = -1
-
-//     def makeGraph(self):
-//         for i in range(25):
-//             node = Node(i + 1)
-//             if self.max_val < node.node_val:
-//                 self.max_val = node.node_val
-
-//             for j in range(3):
-//                 node.nbrs.append(random.randint(1, 25))
-//             self.graph[i+1] = node
-//         print(self.max_val)
-//         ...
-
-//     def printGraph(self):
-//         keys = self.graph.keys()
-//         for k in keys:
-//             print("Node_state: ", k, '\nNode_val:', self.graph[k].node_val)
-//             print("Nbr_st\tValue")
-//             for nbr in self.graph[k].nbrs:
-//                 print(self.graph[nbr].state, '\t\t', self.graph[nbr].node_val)
-//             print('\n')
+// Pythoin Code!!
+/*
+    import random
+    class Node:
+        def __init__(self, st):
+            self.state = st
+            self.nbrs = []
+            self.node_val = random.randint(100, 501)
+    class Graph:
+        def __init__(self):
+            self.graph = {}
+            self.max_val = -1
+        def makeGraph(self):
+            for i in range(25):
+                node = Node(i + 1)
+                if self.max_val < node.node_val:
+                    self.max_val = node.node_val
+                for j in range(3):
+                    node.nbrs.append(random.randint(1, 25))
+                self.graph[i+1] = node
+            print(self.max_val)
+            ...
+        def printGraph(self):
+            keys = self.graph.keys()
+            for k in keys:
+                print("Node_state: ", k, '\nNode_val:', self.graph[k].node_val)
+                print("Nbr_st\tValue")
+                for nbr in self.graph[k].nbrs:
+                    print(self.graph[nbr].state, '\t\t', self.graph[nbr].node_val)
+                print('\n')
+*/
