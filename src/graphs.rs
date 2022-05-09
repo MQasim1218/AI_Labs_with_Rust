@@ -4,16 +4,16 @@
 use rand::Rng;
 use std::collections::HashMap;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum act_type {
     unweighted(u16),    // Reference to the key to a Node in the graph (HashMap)
     wieghted(u16, u16), // Reference to the key and distance to a Node in the graph (HashMap).
 }
 
-#[derive(Debug)]
-enum node_state {
-    normal(u16, u8),        // node_state and self_cost
-    heuristic(u16, u8, u8), // node_state, self_cost and heuristic
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum node_state {
+    normal(u16, u16),         // node_state and self_cost
+    heuristic(u16, u16, u16), // node_state, self_cost and heuristic
 }
 
 #[derive(Debug)]
@@ -23,12 +23,12 @@ pub enum graph_type {
 }
 
 // !! This code shall be used laterr to generify the code!!
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Node {
-    state: node_state,
+    pub state: node_state,
     pub node_val: u16,
     pub actions: Vec<act_type>,
-    par: Option<Box<Node>>,
+    pub par: u16,
 }
 
 impl Node {
@@ -37,7 +37,7 @@ impl Node {
             state,
             actions,
             node_val,
-            par: None,
+            par: 0,
         }
     }
 }
