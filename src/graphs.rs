@@ -34,10 +34,10 @@ enum node_state {
 
 // This Node impl is for proof of concept that our core stuff works!!
 // Latrr to be replaced by the above impl!!
-struct Node {
+pub struct Node {
     state: u16,
-    node_val: u16,
-    actions: Vec<u16>,
+    pub node_val: u16,
+    pub actions: Vec<u16>,
     par: Option<Box<Node>>,
 }
 impl Node {
@@ -58,7 +58,7 @@ pub enum graph_type {
 }
 pub struct Graph {
     num_Nodes: u16,
-    graph: HashMap<u16, Node>,
+    pub graph: HashMap<u16, Node>,
     max_val: u16, // As a suitable goal Node, especially in the hill-climbing algorithm!!
 }
 
@@ -134,6 +134,10 @@ impl Graph {
             println!("\n");
         }
         println!("\nEnd of Graph!!\n");
+    }
+
+    pub fn get_mx(&self) -> (&HashMap<u16, Node>, u16) {
+        (&self.graph, self.max_val)
     }
 
     pub fn get_graph(gt: graph_type, num_Nodes: u16) -> Graph {
