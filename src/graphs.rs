@@ -4,58 +4,64 @@
 use rand::Rng;
 use std::collections::HashMap;
 
-enum action_type {
+#[derive(Debug)]
+pub enum act_type {
     unweighted(u16),    // Reference to the key to a Node in the graph (HashMap)
     wieghted(u16, u16), // Reference to the key and distance to a Node in the graph (HashMap).
 }
 
+#[derive(Debug)]
 enum node_state {
     normal(u16, u8),        // node_state and self_cost
     heuristic(u16, u8, u8), // node_state, self_cost and heuristic
 }
 
-// !! This code shall be used laterr to generify the code!!
-/*
-    struct Node {
-        state: node_state,
-        actions: Vec<action_type>,
-        par: Option<Box<Node>>,
-    }
-    impl Node {
-        fn new(state: node_state, actions: Vec<action_type>) -> Node {
-            Node {
-                state,
-                actions,
-                par: None,
-            }
-        }
-    }
-*/
+#[derive(Debug)]
+pub enum graph_type {
+    wieghted,
+    unweighted,
+}
 
-// This Node impl is for proof of concept that our core stuff works!!
-// Latrr to be replaced by the above impl!!
+// !! This code shall be used laterr to generify the code!!
+#[derive(Debug)]
 pub struct Node {
-    state: u16,
+    state: node_state,
     pub node_val: u16,
-    pub actions: Vec<u16>,
+    pub actions: Vec<act_type>,
     par: Option<Box<Node>>,
 }
+
 impl Node {
-    fn new(state: u16, node_val: u16, actions: Vec<u16>) -> Node {
+    fn new(state: node_state, node_val: u16, actions: Vec<act_type>) -> Node {
         Node {
             state,
-            node_val,
             actions,
+            node_val,
             par: None,
         }
     }
 }
 
-pub enum graph_type {
-    wieghted,
-    unweighted,
-    maze,
-}
+// This Node impl is for proof of concept that our core stuff works!!
+// Latrr to be replaced by the above impl!!
+// pub struct Node {
+//     state: u16,
+//     pub node_val: u16,
+//     pub actions: Vec<u16>,
+//     par: Option<Box<Node>>,
+// }
+// impl Node {
+//     fn new(state: u16, node_val: u16, actions: Vec<u16>) -> Node {
+//         Node {
+//             state,
+//             node_val,
+//             actions,
+//             par: None,
+//         }
+//     }
+// }
+
+#[derive(Debug)]
 pub struct Graph {
     num_Nodes: u16,
     pub graph: HashMap<u16, Node>,
@@ -73,20 +79,33 @@ impl Graph {
     */
 
     fn MakeUnWeiGraph(num_Nodes: u16) -> Graph {
+        /*
+            Create a HashMap to store the Nodes indexed by thier respective states
+            <key, value> :: <index, Node>
+            mx => To capture the max node_value from the Nodes in the graph.
+        */
         let mut graph: HashMap<u16, Node> = HashMap::new();
         let mut mx: u16 = 0;
 
+        // Adding Nodes and neighbours to the graph!!
         for i in 1..=num_Nodes {
+            // Generate a random value for the Node (nv).
             let nv = rand::thread_rng().gen_range(0..=100);
-            let mut nbrs: Vec<u16> = Vec::new();
+            /*
+                Create a vector to store indexes of neighbours
+                act_type here specifies the type of value stored for the neighbour
+                act_type(s) => unweighted::(nbr_indx) / wieghted::(nbr_indx, dist_to_nbr)
+            */
+            let mut nbrs: Vec<act_type> = Vec::new();
 
-            // A fancy for loop to assign random nbrs to a Node!!
+            // A fancy for loop to assign random neighbours to a Node!!
             (0..3).for_each(|_| {
-                let node_indx = rand::thread_rng().gen_range(1..=num_Nodes);
-                nbrs.push(node_indx);
+                // Get a random Node index between range (1 to num_Nodes)
+                let node_indx = act_type::unweighted(rand::thread_rng().gen_range(1..=num_Nodes));
+                nbrs.push(node_indx); // Push the neighbour on to the nbrs vector!
             });
 
-            let node = Node::new(i, nv, nbrs);
+            let node = Node::new(node_state::normal(i, 0), nv, nbrs);
             graph.insert(i, node);
 
             if nv > mx {
@@ -96,18 +115,53 @@ impl Graph {
 
         Graph {
             num_Nodes,
-            graph: graph,
+            graph,
             max_val: mx,
         }
     }
 
     fn MakeWeiGraph(num_Nodes: u16) -> Graph {
-        let graph: HashMap<u16, Node> = HashMap::new();
+        /*
+            Create a HashMap to store the Nodes indexed by thier respective states
+            <key, value> :: <index, Node>
+            mx => To capture the max node_value from the Nodes in the graph.
+        */
+        let mut graph: HashMap<u16, Node> = HashMap::new();
+        let mut mx: u16 = 0;
+
+        // Adding Nodes and neighbours to the graph!!
+        for i in 1..=num_Nodes {
+            // Generate a random value for the Node (nv).
+            let nv = rand::thread_rng().gen_range(0..=100);
+            /*
+                Create a vector to store indexes of neighbours
+                act_type here specifies the type of value stored for the neighbour
+                act_type(s) => unweighted::(nbr_indx) / wieghted::(nbr_indx, dist_to_nbr)
+            */
+            let mut nbrs: Vec<act_type> = Vec::new();
+
+            // A fancy for loop to assign random nbrs to a Node!!
+            (0..3).for_each(|_| {
+                // Get a random Node index between range (1 to num_Nodes)
+                let nbr_indx_dist = act_type::wieghted(
+                    rand::thread_rng().gen_range(1..=num_Nodes),
+                    rand::thread_rng().gen_range(1..=100),
+                );
+                nbrs.push(nbr_indx_dist);
+            });
+
+            let node = Node::new(node_state::normal(i, 0), nv, nbrs);
+            graph.insert(i, node);
+
+            if nv > mx {
+                mx = nv
+            };
+        }
 
         Graph {
             num_Nodes,
-            graph: graph,
-            max_val: 0,
+            graph,
+            max_val: mx,
         }
     }
 
@@ -125,18 +179,18 @@ impl Graph {
         // Basic printing for unweighted, directed graph
         println!("Printing Graph!!");
         for key in self.graph.keys() {
-            println!("Node_state: {}", self.graph[key].state);
-            println!("Node_value: {}", self.graph[key].node_val);
+            println!("Node_state: {:?}", self.graph[key].state);
+            println!("Node_value: {:?}", self.graph[key].node_val);
             print!("Neighbours: ");
             for i in &self.graph[key].actions {
-                print!("{}\t", *i);
+                print!("{:?}\t", *i);
             }
             println!("\n");
         }
         println!("\nEnd of Graph!!\n");
     }
 
-    pub fn get_mx(&self) -> (&HashMap<u16, Node>, u16) {
+    pub fn get_graph_vars(&self) -> (&HashMap<u16, Node>, u16) {
         (&self.graph, self.max_val)
     }
 
@@ -144,7 +198,6 @@ impl Graph {
         match gt {
             graph_type::wieghted => Graph::MakeWeiGraph(num_Nodes),
             graph_type::unweighted => Graph::MakeUnWeiGraph(num_Nodes),
-            graph_type::maze => todo!(),
         }
     }
 }

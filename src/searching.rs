@@ -5,7 +5,7 @@ pub mod informedSeaching {
     pub mod BreadthFirstSearch {
         pub fn BFS(graph: &crate::graphs::Graph, st_node: u16) {
             let mut curr = st_node;
-            let (graph, goal) = graph.get_mx();
+            let (graph, goal) = graph.get_graph_vars();
             println!("The Gaol value is {}", goal);
 
             let mut frontier: Vec<u16> = Vec::new();
@@ -24,8 +24,12 @@ pub mod informedSeaching {
                     break;
                 } else {
                     for nbr in &graph[&curr].actions {
-                        if !(exp.contains(nbr) || frontier.contains(nbr)) {
-                            frontier.push(*nbr); // Push the neighbour on to the frontier
+                        let nbr = match *nbr {
+                            crate::graphs::act_type::unweighted(indx) => indx,
+                            crate::graphs::act_type::wieghted(indx, _) => indx,
+                        };
+                        if !(exp.contains(&nbr) || frontier.contains(&nbr)) {
+                            frontier.push(nbr); // Push the neighbour on to the frontier
                         }
                     }
                 }
@@ -39,7 +43,7 @@ pub mod informedSeaching {
     pub mod DepthFirstSearch {
         pub fn DFS(graph: &crate::graphs::Graph, st_node: u16) {
             let mut curr = st_node;
-            let (graph, goal) = graph.get_mx();
+            let (graph, goal) = graph.get_graph_vars();
             println!("The Gaol value is {}", goal);
 
             let mut frontier: Vec<u16> = Vec::new();
@@ -58,8 +62,12 @@ pub mod informedSeaching {
                     break;
                 } else {
                     for nbr in &graph[&curr].actions {
-                        if !(exp.contains(nbr) || frontier.contains(nbr)) {
-                            frontier.push(*nbr); // Push the neighbour on to the frontier
+                        let nbr = match *nbr {
+                            crate::graphs::act_type::unweighted(indx) => indx,
+                            crate::graphs::act_type::wieghted(indx, _) => indx,
+                        };
+                        if !(exp.contains(&nbr) || frontier.contains(&nbr)) {
+                            frontier.push(nbr); // Push the neighbour on to the frontier
                         }
                     }
                 }
@@ -70,7 +78,7 @@ pub mod informedSeaching {
         }
     }
 
-    mod UninformCostSearch {}
+    pub mod UninformCostSearch {}
 }
 
 mod UninformedSearching {
